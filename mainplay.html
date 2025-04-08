@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Music App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #111, #1d1e22);
+      color: white;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px #000;
+    }
+    .search {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      border: none;
+      border-radius: 5px;
+    }
+    .song-list, .playlist {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    .song, .playlist-item {
+      background: rgba(25, 25, 25, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.05), 0 0 100px rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.6s ease-in-out;
+      position: relative;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .song:hover {
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+      background: rgba(45, 45, 45, 0.9);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .song button, .playlist-item button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.3s;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .song button:hover, .playlist-item button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px #ffffff55;
+    }
+    .add-btn {
+      background: linear-gradient(135deg, rgba(255,154,158,0.5), rgba(250,208,196,0.5));
+    }
+    .next-btn {
+      background: linear-gradient(135deg, rgba(137,247,254,0.5), rgba(102,166,255,0.5));
+    }
+    .nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav a {
+      color: #00acee;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎵 My Music App</h1>
+  <div class="nav">
+    <a href="#" onclick="showSongs()">Home</a>
+    <a href="#" onclick="showPlaylist()">My Playlist</a>
+  </div>
+  <div class="search">
+    <input type="text" id="searchBox" placeholder="Search songs..." oninput="filterSongs()">
+  </div>
+  <div id="content"></div>
+
+  <script>
+    const songs = [
+      { name: "En Aasa", file: "En-Aasai-Mythiliye.mp3" },
+            { name: "En uyire", file: "En-Uyire.mp3" },
+            { name: "Enna kurai", file: "Enna-Kurai-MassTamilan.fm.mp3" },
+            { name: "Enthara", file: "Enthara-Enthara.mp3" },
+            { name: "Ezhutha kadhaiyo", file: "Ezhutha Kadhaiyo.mp3" },
+            { name: "Goa", file: "Goa.mp3" },
+            { name: "Hey minaley", file: "Hey Minnale.mp3" },
+            { name: "HOLD ME NOW", file: "Hold-Me-Now-MassTamilan.com.mp3" },
+            { name: "Iyley", file: "Iyley-Iyley.mp3" },
+            { name: "Kana kaanum", file: "Kanaa-Kaanum-Kaalangal.mp3" },
+            { name: "Kannan varum", file: "Kannan-Varum-Velai.mp3" },
+            { name: "Konjam", file: "Konjam Konjam.mp3" },
+            { name: "Macho", file: "Maacho-Ennacho-MassTamilan.com.mp3" },
+            { name: "Mari gethu", file: "Maari-Gethu-MassTamilan.org.mp3" },
+            { name: "Mellinamey", file: "Mellinamae-Mellinamae.mp3" },
+            { name: "Mudhal nee", file: "Mudhal-Nee-Mudivum-Nee.mp3" },
+            { name: "Mundasu sooriyane", file: "Mundasu-Sooriyane.mp3" },
+            { name: "Nanbane", file: "Nanbane.mp3" },
+            { name: "Nee illai", file: "Nee-Illai-Enral.mp3" },
+            { name: "neethane", file: "Neethane.mp3" },
+            { name: "Nenjodu kalinthidu", file: "Nenjodu-Kalinthidu.mp3" },
+            { name: "Omg ponnu", file: "OMG-Ponnu-MassTamilan.org.mp3" },
+            { name: "Oru kan jaadai", file: "Oru-Kan-Jaadai.mp3" },
+            { name: "Otraikannale", file: "Otraikannale.mp3" },
+            { name: "Pathagathi", file: "Paathagathi-Kannupattu.mp3" },
+            { name: "pachai niramey", file: "Pachchai-Nirame.mp3" },
+            { name: "pazhaiya sooru", file: "Pazhaya-Soru.mp3" },
+            { name: "Poovukul", file: "Poovukkul.mp3" },
+            { name: "roja roja", file: "Roja-Roja.mp3" },
+            { name: "saachitaley", file: "Saachitale-MassTamilan.dev.mp3" },
+            { name: "saroja", file: "Saroja-Saman-Nikalo.mp3" },
+            { name: "sei yedavathu sei", file: "Sei-Yedhavathu-Sei-MassTamilan.fm.mp3" },
+            { name: "thanimaiye", file: "Thanimaye-Thanimaye-MassTamilan.io.mp3" },
+            { name: "thanimaiye original", file: "Thanimaye.mp3" },
+            { name: "theethiriyai", file: "theethiriyai.mp3" },
+            { name: "ullara  poondhu", file: "Ullara-Poondhu.mp3" },
+            { name: "vaartha onu", file: "Vaartha-Onnu.mp3" },
+            { name: "vidikindra pozhuthu", file: "Vidikindra-Pozhuthu.mp3" },
+            { name: "vizhigalil", file: "Vizhigalil-Oru-Vaanavil.mp3" },
+            { name: "yedho ondru", file: "Yedho-Ondru-Ennai.mp3" }
+           
+    ];
+
+    let playlist = [];
+    let currentIndex = 0;
+
+    function showSongs() {
+      const container = document.getElementById("content");
+      container.innerHTML = renderSongCard(songs[currentIndex]);
+    }
+
+    function renderSongCard(song) {
+      return `
+        <div class="song-list">
+          <div class="song">
+            <strong>${song.name}</strong>
+            <audio controls src="${song.file}" style="margin-top: 10px;"></audio>
+            <button class="add-btn" onclick="addToPlaylist('${song.name}', '${song.file}')">Add to Playlist</button>
+            <button class="next-btn" onclick="nextSong()" style="margin-top: 10px;">Next Song</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function nextSong() {
+      currentIndex = (currentIndex + 1) % songs.length;
+      showSongs();
+    }
+
+    function filterSongs() {
+      const query = document.getElementById("searchBox").value.toLowerCase();
+      const filtered = songs.filter(song => song.name.toLowerCase().includes(query));
+      currentIndex = 0;
+      if (filtered.length > 0) {
+        const container = document.getElementById("content");
+        container.innerHTML = renderSongCard(filtered[0]);
+      } else {
+        document.getElementById("content").innerHTML = '<p style="text-align:center">No songs found.</p>';
+      }
+    }
+
+    function addToPlaylist(name, file) {
+      if (!playlist.find(song => song.name === name)) {
+        playlist.push({ name, file });
+        alert(`Added "${name}" to playlist.`);
+      } else {
+        alert(`"${name}" is already in your playlist.`);
+      }
+    }
+
+    function showPlaylist() {
+      const container = document.getElementById("content");
+      if (playlist.length === 0) {
+        container.innerHTML = '<p style="text-align:center">Your playlist is empty.</p>';
+        return;
+      }
+      container.innerHTML = '<div class="playlist">' +
+        playlist.map(song => `
+          <div class="playlist-item">
+            <strong>${song.name}</strong>
+            <audio controls src="${song.file}" style="margin-top: 10px;"></audio>
+            <button onclick="removeFromPlaylist('${song.name}')">Remove</button>
+          </div>
+        `).join('') + '</div>';
+    }
+
+    function removeFromPlaylist(name) {
+      playlist = playlist.filter(song => song.name !== name);
+      showPlaylist();
+    }
+
+    showSongs();
+  </script>
+</body>
+</html>
